@@ -1,14 +1,26 @@
 import "./App.css";
 import { Button, Form } from "react-bootstrap";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
-// import { ReactComponent as DeleteIcon } from "./assets/delete.png";
 
 function App() {
+  const localeTodoList = JSON.parse(localStorage.getItem("todoList"));
+  const localeActiveTaskCount = JSON.parse(
+    localStorage.getItem("activeTaskCount")
+  );
   const [todo, setTodo] = useState("");
-  const [todoList, setTodoList] = useState([]);
-  const [activeTaskCount, setActiveTaskCount] = useState(0);
+  const [todoList, setTodoList] = useState(
+    localeTodoList ? localeTodoList : []
+  );
+  const [activeTaskCount, setActiveTaskCount] = useState(
+    localeActiveTaskCount ? localeActiveTaskCount : 0
+  );
+
+  useEffect(() => {
+    localStorage.setItem("todoList", JSON.stringify(todoList));
+    localStorage.setItem("activeTaskCount", activeTaskCount);
+  }, [todoList, activeTaskCount]);
 
   const addTodo = () => {
     if (todo === "") return;
@@ -51,7 +63,7 @@ function App() {
           value={todo}
           onChange={e => setTodo(e.target.value)}
         />
-        <Button className="ms-3" onClick={addTodo} type="submit">
+        <Button className="ms-3" onClick={addTodo}>
           Submit
         </Button>
       </div>
@@ -60,9 +72,9 @@ function App() {
           <div key={todo.id} className="d-flex mt-2 justify-content-between">
             <div className="d-flex">
               <Form.Check
-                type="checkbox"
+                type="switch"
                 className="me-3"
-                value={todo.isCompleted}
+                checked={todo.isCompleted}
                 onChange={() => completeTodo(todo)}
               />
               <label
